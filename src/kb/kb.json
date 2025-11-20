@@ -1,0 +1,72 @@
+[
+  {
+    "id": "signup",
+    "question": "How do I sign up?",
+    "answer": "Go to /signup, enter a valid email and a password (minimum 8 characters, include uppercase, lowercase, number and symbol). After signup the app sets an httpOnly JWT cookie for authentication."
+  },
+  {
+    "id": "login",
+    "question": "How do I log in?",
+    "answer": "Go to /login and enter your registered email and password. On success a secure httpOnly cookie named 'token' is set for the session."
+  },
+  {
+    "id": "logout",
+    "question": "How do I log out?",
+    "answer": "Call POST /api/auth/logout or click the logout button in the UI. The server clears the auth cookie and returns a success message."
+  },
+  {
+    "id": "create-blog",
+    "question": "How do I create a blog post?",
+    "answer": "You must be logged in. From the Dashboard click New Post, provide a title and content. The backend will auto-generate a URL-friendly slug. Only the logged-in user is stored as the author."
+  },
+  {
+    "id": "edit-blog",
+    "question": "Who can edit a blog?",
+    "answer": "Only the original author (the user who created the blog) can edit a blog. The edit endpoint checks the JWT and compares req.user._id with the blog's author field."
+  },
+  {
+    "id": "delete-blog",
+    "question": "Who can delete a blog?",
+    "answer": "Only the blog's author can delete it. Deletion is protected by auth middleware and an author check on the resource before removal."
+  },
+  {
+    "id": "password-rules",
+    "question": "What are the password rules?",
+    "answer": "Passwords must be at least 8 characters and include uppercase, lowercase, a number, and a symbol. The server enforces this at route validation; the password is hashed with bcrypt before storage."
+  },
+  {
+    "id": "public-access",
+    "question": "Are blogs public?",
+    "answer": "Yes. Everyone can fetch published blogs via GET /api/blogs; no authentication required for reading posts."
+  },
+  {
+    "id": "auth-storage",
+    "question": "How is authentication stored on the client?",
+    "answer": "The app stores the JWT in an httpOnly cookie named 'token'. The client does not store the raw token in localStorage for XSS safety."
+  },
+  {
+    "id": "api-endpoints",
+    "question": "What API endpoints are available?",
+    "answer": "Key endpoints: POST /api/auth/signup, POST /api/auth/login, POST /api/auth/logout, POST /api/blog (create, auth required), GET /api/blogs, GET /api/blogs/:slug, PUT /api/blogs/edit/:id (author only), DELETE /api/blogs/delete/:id (author only), POST /api/ai/query (support bot)."
+  },
+  {
+    "id": "slug-generation",
+    "question": "How are URLs/slugs generated?",
+    "answer": "Backend generates slugs from the title (slugify) and appends -1, -2 etc. if a collision occurs, ensuring unique URLs."
+  },
+  {
+    "id": "data-storage",
+    "question": "Where is data stored?",
+    "answer": "This project uses MongoDB via Mongoose. Users and blogs are stored in collections; passwords are hashed before saving."
+  },
+  {
+    "id": "agent-scope",
+    "question": "What can the support agent answer?",
+    "answer": "The agent answers only questions contained in this static KB (platform usage, API endpoints, auth rules, and UX). If the KB doesn't include the answer, it will politely say it doesn't know."
+  },
+  {
+    "id": "report-bug",
+    "question": "How do I report a bug or request a feature?",
+    "answer": "Open an issue in the project repo or send a message via the support channel specified in the app (if available). For demo purposes, add a 'Contact' link to the README."
+  }
+]
