@@ -23,7 +23,7 @@ app.use("/", userRouter);
 app.use("/", blogRouter)
 app.use("/" , supporRouter);
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 
 (async () => {
     try {
