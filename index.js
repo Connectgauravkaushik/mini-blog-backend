@@ -9,35 +9,19 @@ require("dotenv").config();
 
 const app = express();
 
-
-const allowedOrigins = (process.env.CORS_ORIGINS || "http://localhost:3000,https://mini-blogjar.netlify.app")
-  .split(",")
-  .map(s => s.trim());
-
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error("CORS: Origin not allowed - " + origin));
-    }
-  },
+app.use(cors({
+  origin: "*",
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "Accept", "X-Requested-With"],
-  exposedHeaders: ["Set-Cookie"]
-};
-
-
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
 
 
 app.use(cookieParser());
 app.use(express.json());
 
 
+// Health check route (VERY important)
 app.get("/", (req, res) => {
   res.status(200).send("Backend OK");
 });
@@ -58,7 +42,7 @@ const PORT = process.env.PORT || 3000;
 
     console.log("process.env.PORT =", process.env.PORT);
 
-    app.listen(PORT, "0.0.0.0", () => {
+    app.listen(PORT,"0.0.0.0" ,() => {
       console.log(`Server is running on port ${PORT}`);
     });
 
