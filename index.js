@@ -16,8 +16,9 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-app.use(express.json());
 app.use(cookieParser());
+app.use(express.json());
+
 
 // Health check route (VERY important)
 app.get("/", (req, res) => {
@@ -38,9 +39,9 @@ const PORT = process.env.PORT || 3000;
     await connectDB();
     console.log("Database connected successfully");
 
-    console.log("process.env.PORT =", process.env.PORT); // debug: shows Render-assigned port
+    console.log("process.env.PORT =", process.env.PORT);
 
-    app.listen(PORT, "0.0.0.0", () => {
+    app.listen(PORT,"0.0.0.0" ,() => {
       console.log(`Server is running on port ${PORT}`);
     });
 

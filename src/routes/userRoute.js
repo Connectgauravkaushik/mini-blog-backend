@@ -44,12 +44,15 @@ userRouter.post("/api/auth/signup", async (req, res) => {
 
         const token = newUser.getJWT();
 
+        // dev only — NOT for production
         res.cookie("token", token, {
             httpOnly: true,
-            maxAge: 24 * 60 * 60 * 1000,
+            secure: true,        // IMPORTANT for Render
+            sameSite: "none",    // REQUIRED for cross-origin cookies
+            maxAge: 8 * 3600000
         });
 
-        const { password:_ , ...userCreated } = newUser.toObject();
+        const { password: _, ...userCreated } = newUser.toObject();
 
         return res
             .status(201)
@@ -63,35 +66,41 @@ userRouter.post("/api/auth/signup", async (req, res) => {
 
 //Authenticate and return session/JWT
 userRouter.post("/api/auth/login", async (req, res) => {
-  try {
-    const { email, password } = req.body;
+    try {
+        const { email, password } = req.body;
 
-    if (!email || !password) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Please provide email and password" });
+        if (!email || !password) {
+            return res
+                .status(400)
+                .json({ success: false, message: "Please provide email and password" });
+        }
+
+        const user = await User.findOne({ email });
+
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        const isValidPassword = await user.validatePassword(password);
+        if (!isValidPassword)
+            return res.status(400).json({ message: "Invalid password" });
+
+        const token = user.getJWT();
+
+        // dev only — NOT for production
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            maxAge: 8 * 3600000
+        });
+
+        const { password: _, "__v": __, ...loggedInUser } = user.toObject();
+        return res
+            .status(200)
+            .json({ success: true, message: "Login successfully ✅", NewUser: loggedInUser });
+    } catch (err) {
+        console.error("Login error:", err);
+        return res.status(500).send("not working ");
     }
-
-    const user = await User.findOne({ email });
-
-    if (!user) return res.status(404).json({ message: "User not found" });
-
-    const isValidPassword = await user.validatePassword(password);
-    if (!isValidPassword)
-      return res.status(400).json({ message: "Invalid password" });
-
-    const token = user.getJWT();
-
-    res.cookie("token", token, { httpOnly: true, maxAge: 8 * 3600000 });
-
-    const { password: _, "__v": __, ...loggedInUser } = user.toObject();
-    return res
-      .status(200)
-      .json({ success: true, message: "Login successfully ✅", NewUser: loggedInUser });
-  } catch (err) {
-    console.error("Login error:", err);
-    return res.status(500).send("not working ");
-  }
 });
 
 // logout
