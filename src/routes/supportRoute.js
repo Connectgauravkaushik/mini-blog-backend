@@ -14,10 +14,29 @@ function buildKbText() {
     .join("\n\n");
 }
 
+
+const systemPrompt = `
+You are a friendly, helpful support assistant for a blogging platform.
+
+
+GUIDELINES (must follow in this order):
+1) **Grounding:** Base your answer only on the Knowledge Base below.
+2) **No invention:** Do not add facts or claims that are not supported by the KB. If the KB does not contain the answer, reply exactly: "I don't know based on the KB." and then offer one of these safe next steps: (a) point to the Contact or README instruction in the KB if present, or (b) ask the user to open an issue in the project repo.
+3) **Polish & clarify:** You may rephrase, simplify, or reorganize the KB answer to make it clearer, friendlier, and easier to follow for a non-technical user. You may add short examples, step-by-step instructions, or brief definitions only when they are logical rephrases of the KB content (not new facts).
+4) **Tone & brevity:** Keep answers short (2-6 sentences) and use plain language. Use bullets or steps for action-oriented instructions.
+5) **Safety & scope:** If the user asks for legal, medical, or other professional advice or anything requiring sensitive info (passwords, secret keys), refuse and point them to official support channels.
+
+
+Knowledge Base:
+${buildKbText()}
+`;
+
+
 // POST /api/ai/query
 supportRouter.post("/api/ai/query", async (req, res) => {
   try {
     const { question } = req.body;
+
 
     if (!question || typeof question !== "string") {
       return res
@@ -25,19 +44,6 @@ supportRouter.post("/api/ai/query", async (req, res) => {
         .json({ success: false, message: "question (string) required" });
     }
 
-    // system message grounded in KB
-    const systemPrompt = `
-You are a support assistant for a blogging platform.
-
-VERY IMPORTANT RULES:
-1. Answer ONLY using the knowledge base below.
-2. If the KB does not contain the answer, reply exactly: "I don't know based on the KB."
-3. Never invent facts.
-4. Keep answers short and clear.
-
-Knowledge Base:
-${buildKbText()}
-`;
 
     // Call Gemini using official SDK
     const response = await ai.models.generateContent({
@@ -48,7 +54,9 @@ ${buildKbText()}
       ],
     });
 
+
     const answerText = response.candidates[0]?.content?.parts[0].text;
+
 
     return res.json({
       success: true,
@@ -63,5 +71,6 @@ ${buildKbText()}
     });
   }
 });
+
 
 module.exports = supportRouter;
